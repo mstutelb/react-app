@@ -1,25 +1,53 @@
 import './employees-list-item.css';
+import { Component } from 'react';
 
-const EmployeesListItem = ({ name, salary, increase }) => {
-  const itemClassList = ['list-group-item', 'd-flex', 'justify-content-between'];
-  if (increase) itemClassList.push('increase');
+class EmployeesListItem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      increase: false,
+      liked: false,
+    };
+  }
 
-  return (
-    <li className={itemClassList.join(' ')}>
-      <span className="list-group-item-label">{name}</span>
-      <input type="text" className="list-group-item-input" defaultValue={salary + '$'} />
-      <div className="d-flex justify-content-center align-items-center">
-        <button type="button" className="btn-cookie btn-sm ">
-          <i className="fas fa-cookie"></i>
-        </button>
+  onIncrease = () => {
+    this.setState(({ increase }) => ({
+      increase: !increase,
+    }));
+  };
 
-        <button type="button" className="btn-trash btn-sm ">
-          <i className="fas fa-trash"></i>
-        </button>
-        <i className="fas fa-star"></i>
-      </div>
-    </li>
-  );
-};
+  onLike = () => {
+    this.setState(({ liked }) => ({
+      liked: !liked,
+    }));
+  };
+
+  render() {
+    const { name, salary, onDelete } = this.props;
+    const { increase, liked } = this.state;
+    const itemClassList = ['list-group-item', 'd-flex', 'justify-content-between'];
+    if (increase) itemClassList.push('increase');
+    if (liked) itemClassList.push('like');
+
+    return (
+      <li className={itemClassList.join(' ')}>
+        <span onClick={this.onLike} className="list-group-item-label">
+          {name}
+        </span>
+        <input type="text" className="list-group-item-input" defaultValue={salary + '$'} />
+        <div className="d-flex justify-content-center align-items-center">
+          <button type="button" onClick={this.onIncrease} className="btn-cookie btn-sm ">
+            <i className="fas fa-cookie"></i>
+          </button>
+
+          <button onClick={onDelete} type="button" className="btn-trash btn-sm ">
+            <i className="fas fa-trash"></i>
+          </button>
+          <i className="fas fa-star"></i>
+        </div>
+      </li>
+    );
+  }
+}
 
 export default EmployeesListItem;
