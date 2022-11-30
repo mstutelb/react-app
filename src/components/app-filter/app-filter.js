@@ -1,22 +1,31 @@
-import "./app-filter.css";
+import './app-filter.css';
 
-const AppFilter = () => {
+const tabList = [
+  { slug: 'all', text: 'Все сотрудники' },
+  { slug: 'increase', text: 'На повышение' },
+  { slug: 'high', text: 'З/П больше 1000$' },
+];
+
+const AppFilter = ({ filterTab, onFilterTabChange }) => {
+  const onButtonClick = (tab) => () => {
+    onFilterTabChange(tab);
+  };
+
+  const elements = tabList.map((item) => {
+    const classList = ['btn'];
+    if (item.slug === filterTab) {
+      classList.push('btn-light');
+    } else {
+      classList.push('btn-outline-light');
+    }
     return (
-        <div className="btn-group">
-            <button type="button"
-                    className="btn btn-light">
-                    Все сотрудники
-            </button>
-            <button type="button"
-                    className="btn btn-outline-light">
-                    На повышение
-            </button>
-            <button type="button"
-                    className="btn btn-outline-light">
-                    З/П больше 1000$
-            </button>
-        </div>
-    )
-}
+      <button key={item.slug} onClick={onButtonClick(item.slug)} type="button" className={classList.join(' ')}>
+        {item.text}
+      </button>
+    );
+  });
+
+  return <div className="btn-group">{elements}</div>;
+};
 
 export default AppFilter;

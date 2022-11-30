@@ -19,18 +19,26 @@ class App extends Component {
           name: 'John',
           salary: 1000,
           increase: true,
+          like: true,
         },
         {
           id: 2,
           name: 'Anna',
           salary: 2000,
+          increase: false,
+          like: false,
         },
         {
           id: 3,
           name: 'Bob',
           salary: 30001,
+          increase: false,
+          like: false,
         },
       ],
+
+      query: '',
+      filterTab: 'all',
     };
 
     this.nextId = 4;
@@ -46,7 +54,6 @@ class App extends Component {
   };
 
   onAddEmployer = (employer) => {
-    console.log('employer', employer);
     const modifyEmployer = { ...employer, id: this.nextId++ };
     this.setState(({ data }) => {
       return {
@@ -55,18 +62,59 @@ class App extends Component {
     });
   };
 
+  onToggleValue = (id, field) => {
+    console.log(id, field);
+    this.setState(({ data }) => {
+      const newData = data.map((item) => {
+        if (item.id === id) {
+          return { ...item, [field]: !item[field] };
+        }
+
+        return item;
+      });
+
+      return { data: newData };
+    });
+  };
+
+  onSearchChange = (query) => {
+    this.setState({ query });
+  };
+
+  onFilterTabChange = (filterTab) => {
+    this.setState({ filterTab });
+  };
+
+  filterByTab = (data, filterTab) => {
+    const HIGH_SALARY = 1000;
+    if (filterTab === 'increase') return data.filter((item) => item.increase);
+    if (filterTab === 'high') return data.filter((item) => item.salary > HIGH_SALARY);
+    return data;
+  };
+
+  filterData = ({ data, query, filterTab }) => {
+    const filteredByTabs = this.filterByTab(data, filterTab);
+    if (!query) return filteredByTabs;
+    return filteredByTabs.filter((item) => {
+      return item.name.toLowerCase().includes(query);
+    });
+  };
+
   render() {
-    const { data } = this.state;
+    const { data, query, filterTab } = this.state;
+    const employersNumber = data.length;
+    const goodEmployers = data.filter((item) => item.increase).length;
+    const filteredData = this.filterData({ data, query, filterTab });
     return (
       <div className="app">
-        <AppInfo />
+        <AppInfo employersNumber={employersNumber} goodEmployers={goodEmployers} />
 
         <div className="search-panel">
-          <SearchPanel />
-          <AppFilter />
+          <SearchPanel onSearchChange={this.onSearchChange} query={query} />
+          <AppFilter filterTab={filterTab} onFilterTabChange={this.onFilterTabChange} />
         </div>
 
-        <EmployeesList data={data} onDelete={this.onDelete} />
+        <EmployeesList data={filteredData} onDelete={this.onDelete} onToggleValue={this.onToggleValue} />
         <EmployeesAddForm onAddEmployer={this.onAddEmployer} />
       </div>
     );
